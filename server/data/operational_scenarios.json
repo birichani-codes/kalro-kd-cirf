@@ -1,0 +1,315 @@
+[
+  {
+    "id": "usb-malware",
+    "title": "Unauthorized USB and Malware Activity",
+    "scenario_type": "tabletop",
+    "incident_type": "malware_removable_media",
+    "default_severity": "high",
+    "description": "An unauthorized USB storage device is connected to a workstation, followed by suspicious PowerShell execution and outbound network activity.",
+    "expected_classification": {
+      "category": "Malware / Unauthorized Removable Media",
+      "severity": "high",
+      "impact": "Potential endpoint compromise and malware execution"
+    },
+    "injects": [
+      {
+        "id": "usb-1",
+        "order": 1,
+        "title": "Unauthorized removable media detected",
+        "content": "Unknown USB storage device connected to KALRO-PC-07. Device authorization status is unknown.",
+        "expected_actions": [
+          "Validate the event",
+          "Identify user and asset",
+          "Open or link an incident"
+        ]
+      },
+      {
+        "id": "usb-2",
+        "order": 2,
+        "title": "Suspicious PowerShell execution",
+        "content": "powershell.exe executed with suspicious command-line behaviour shortly after USB insertion.",
+        "expected_actions": [
+          "Classify likely malware activity",
+          "Review process and endpoint evidence",
+          "Search institutional knowledge"
+        ]
+      },
+      {
+        "id": "usb-3",
+        "order": 3,
+        "title": "Outbound connection observed",
+        "content": "KALRO-PC-07 initiates HTTPS communication to an unknown external address with suspicious reputation.",
+        "expected_actions": [
+          "Escalate if required",
+          "Select a defensive routine",
+          "Begin containment"
+        ]
+      },
+      {
+        "id": "usb-4",
+        "order": 4,
+        "title": "Containment verification",
+        "content": "After isolation, no further suspicious outbound connections are observed.",
+        "expected_actions": [
+          "Confirm containment",
+          "Preserve evidence",
+          "Proceed to recovery"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "phishing-account",
+    "title": "Phishing and Compromised User Account",
+    "scenario_type": "tabletop",
+    "incident_type": "phishing_account_compromise",
+    "default_severity": "high",
+    "description": "A KALRO user reports a phishing email, followed by repeated failed sign-ins, a successful login from an unfamiliar source, and suspicious mailbox changes.",
+    "expected_classification": {
+      "category": "Phishing / Credential Compromise",
+      "severity": "high",
+      "impact": "Potential unauthorized mailbox and account access"
+    },
+    "injects": [
+      {
+        "id": "phish-1",
+        "order": 1,
+        "title": "Suspicious login",
+        "content": "Authentication monitoring flags 14 failed sign-ins followed by a successful login to carol@kalro.org from 203.0.113.24 using an unrecognized Windows / Chrome browser.",
+        "expected_actions": [
+          "Acknowledge alert",
+          "Validate user activity",
+          "Open or link an incident"
+        ]
+      },
+      {
+        "id": "phish-2",
+        "order": 2,
+        "title": "Phishing report",
+        "content": "Carol Njoroge reports receiving an email titled “Action Required: Verify Your KALRO Mailbox” from security-update@kalro-helpdesk.example. The message linked to https://kalro-verify.example/login.",
+        "expected_actions": [
+          "Classify likely credential compromise",
+          "Search institutional knowledge",
+          "Assess severity"
+        ]
+      },
+      {
+        "id": "phish-3",
+        "order": 3,
+        "title": "Mailbox persistence",
+        "content": "A new mailbox forwarding rule is detected on carol@kalro.org and the unfamiliar session remains active.",
+        "expected_actions": [
+          "Revoke sessions",
+          "Disable or secure the account",
+          "Remove unauthorized forwarding rule"
+        ]
+      },
+      {
+        "id": "phish-4",
+        "order": 4,
+        "title": "Recovery evidence",
+        "content": "After session revocation, credential reset, MFA verification and removal of the forwarding rule, no further suspicious logins are observed.",
+        "expected_actions": [
+          "Confirm recovery",
+          "Capture lessons learned",
+          "Close the incident"
+        ]
+      }
+    ],
+    "affected_user": {
+      "name": "Carol Njoroge",
+      "email": "carol@kalro.org",
+      "department": "Research",
+      "account_type": "KALRO email and identity account"
+    },
+    "phishing_email": {
+      "from_display": "KALRO ICT Support",
+      "from_address": "security-update@kalro-helpdesk.example",
+      "to": "carol@kalro.org",
+      "subject": "Action Required: Verify Your KALRO Mailbox",
+      "body_preview": "Your mailbox will be temporarily restricted unless you verify your account before the end of the day. Use the verification link below to confirm your KALRO account.",
+      "suspicious_url": "https://kalro-verify.example/login",
+      "indicator_note": "The display name imitates KALRO ICT, but the sender domain and verification URL are not kalro.org."
+    },
+    "alert": {
+      "source": "KALRO Authentication & Mail Security Monitor",
+      "title": "Suspicious sign-in after reported phishing email",
+      "account": "carol@kalro.org",
+      "source_ip": "203.0.113.24",
+      "device": "Unrecognized Windows / Chrome browser",
+      "failed_attempts": 14,
+      "observations": [
+        "14 failed sign-in attempts were recorded before a successful login.",
+        "The successful login originated from an unfamiliar external IP address and unrecognized browser.",
+        "The user reported a suspicious account-verification email shortly before the login.",
+        "A new mailbox forwarding rule and active unfamiliar session indicate possible persistence."
+      ]
+    },
+    "incident_defaults": {
+      "title": "Phishing and Compromised KALRO User Account",
+      "type": "phishing",
+      "severity": "high",
+      "description": "Carol Njoroge (carol@kalro.org) reported a suspicious account-verification email. Authentication monitoring subsequently recorded repeated failed sign-in attempts followed by a successful login from an unfamiliar external IP and unrecognized browser. The event is being treated as a possible phishing-induced credential compromise.",
+      "affected_user": "carol@kalro.org",
+      "source_ip": "203.0.113.24",
+      "email_sender": "security-update@kalro-helpdesk.example",
+      "email_subject": "Action Required: Verify Your KALRO Mailbox",
+      "suspicious_url": "https://kalro-verify.example/login"
+    }
+  },
+  {
+    "id": "ransomware",
+    "title": "Ransomware-Like Endpoint Activity",
+    "scenario_type": "tabletop",
+    "incident_type": "ransomware",
+    "default_severity": "critical",
+    "description": "An endpoint begins rapidly renaming files and generating ransom-note artefacts while attempting network access to shared resources.",
+    "expected_classification": {
+      "category": "Ransomware / Malware",
+      "severity": "critical",
+      "impact": "Potential data encryption and lateral spread"
+    },
+    "injects": [
+      {
+        "id": "ran-1",
+        "order": 1,
+        "title": "Mass file changes",
+        "content": "Rapid file rename and extension changes detected on KALRO-PC-21.",
+        "expected_actions": [
+          "Treat as high-priority malware",
+          "Open incident",
+          "Preserve logs"
+        ]
+      },
+      {
+        "id": "ran-2",
+        "order": 2,
+        "title": "Ransom note created",
+        "content": "A ransom-note file appears on the desktop and multiple directories become inaccessible.",
+        "expected_actions": [
+          "Escalate",
+          "Search ransomware response knowledge",
+          "Begin containment"
+        ]
+      },
+      {
+        "id": "ran-3",
+        "order": 3,
+        "title": "Shared-drive connection attempt",
+        "content": "The endpoint attempts SMB connections to shared resources.",
+        "expected_actions": [
+          "Isolate endpoint",
+          "Protect shared resources",
+          "Check for lateral movement"
+        ]
+      },
+      {
+        "id": "ran-4",
+        "order": 4,
+        "title": "Restoration readiness",
+        "content": "Endpoint is isolated and a clean restore point is available.",
+        "expected_actions": [
+          "Validate containment",
+          "Recover from trusted source",
+          "Increase monitoring"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "insider-exfiltration",
+    "title": "Suspected Insider Data Exfiltration",
+    "scenario_type": "tabletop",
+    "incident_type": "data_exfiltration",
+    "default_severity": "high",
+    "description": "A privileged user accesses an unusually large volume of sensitive files and transfers data to an unapproved destination.",
+    "expected_classification": {
+      "category": "Insider Threat / Data Exfiltration",
+      "severity": "high",
+      "impact": "Potential unauthorized disclosure of sensitive information"
+    },
+    "injects": [
+      {
+        "id": "ins-1",
+        "order": 1,
+        "title": "Unusual bulk access",
+        "content": "A privileged account reads a large number of sensitive files outside normal working patterns.",
+        "expected_actions": [
+          "Validate user activity",
+          "Assess asset sensitivity",
+          "Open incident"
+        ]
+      },
+      {
+        "id": "ins-2",
+        "order": 2,
+        "title": "Unapproved transfer",
+        "content": "A large outbound transfer is detected to an unapproved destination.",
+        "expected_actions": [
+          "Escalate",
+          "Search data-exfiltration procedures",
+          "Preserve evidence"
+        ]
+      },
+      {
+        "id": "ins-3",
+        "order": 3,
+        "title": "Continued access",
+        "content": "The account continues accessing sensitive repositories after the alert.",
+        "expected_actions": [
+          "Restrict access",
+          "Contain transfer path",
+          "Coordinate with responsible management"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "bruteforce-login",
+    "title": "Brute-Force and Suspicious Authentication",
+    "scenario_type": "tabletop",
+    "incident_type": "authentication_attack",
+    "default_severity": "medium",
+    "description": "Repeated failed authentication attempts are followed by a successful login from a new source.",
+    "expected_classification": {
+      "category": "Authentication Attack / Credential Compromise",
+      "severity": "medium",
+      "impact": "Potential unauthorized account access"
+    },
+    "injects": [
+      {
+        "id": "bf-1",
+        "order": 1,
+        "title": "Failed-login burst",
+        "content": "More than 50 failed logins target one account in a short period.",
+        "expected_actions": [
+          "Validate alert",
+          "Identify source and user",
+          "Assess lockout controls"
+        ]
+      },
+      {
+        "id": "bf-2",
+        "order": 2,
+        "title": "Successful login",
+        "content": "A successful login occurs from the same unfamiliar source after the failed attempts.",
+        "expected_actions": [
+          "Raise severity",
+          "Secure account",
+          "Search institutional knowledge"
+        ]
+      },
+      {
+        "id": "bf-3",
+        "order": 3,
+        "title": "Post-login activity",
+        "content": "The account attempts access to resources not normally used by the user.",
+        "expected_actions": [
+          "Contain account",
+          "Review authorization",
+          "Escalate if privilege abuse is suspected"
+        ]
+      }
+    ]
+  }
+]

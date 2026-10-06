@@ -1,0 +1,107 @@
+[
+  {
+    "id": "tt3f74fa0e",
+    "scenario_name": "Suspected Insider Data Exfiltration",
+    "scenario_type": "tabletop",
+    "scenario_id": "insider-exfiltration",
+    "test_mode": "kd_cirf",
+    "comparison_group": "insider-exfiltration",
+    "scenario_snapshot": {
+      "id": "insider-exfiltration",
+      "title": "Suspected Insider Data Exfiltration",
+      "scenario_type": "tabletop",
+      "incident_type": "data_exfiltration",
+      "default_severity": "high",
+      "description": "A privileged user accesses an unusually large volume of sensitive files and transfers data to an unapproved destination.",
+      "expected_classification": {
+        "category": "Insider Threat / Data Exfiltration",
+        "severity": "high",
+        "impact": "Potential unauthorized disclosure of sensitive information"
+      },
+      "injects": [
+        {
+          "id": "ins-1",
+          "order": 1,
+          "title": "Unusual bulk access",
+          "content": "A privileged account reads a large number of sensitive files outside normal working patterns.",
+          "expected_actions": [
+            "Validate user activity",
+            "Assess asset sensitivity",
+            "Open incident"
+          ]
+        },
+        {
+          "id": "ins-2",
+          "order": 2,
+          "title": "Unapproved transfer",
+          "content": "A large outbound transfer is detected to an unapproved destination.",
+          "expected_actions": [
+            "Escalate",
+            "Search data-exfiltration procedures",
+            "Preserve evidence"
+          ]
+        },
+        {
+          "id": "ins-3",
+          "order": 3,
+          "title": "Continued access",
+          "content": "The account continues accessing sensitive repositories after the alert.",
+          "expected_actions": [
+            "Restrict access",
+            "Contain transfer path",
+            "Coordinate with responsible management"
+          ]
+        }
+      ]
+    },
+    "participant_id": "u1",
+    "participant_label": "Alice Mwangi",
+    "participant_role": "super_admin",
+    "station_id": "Headquarters",
+    "status": "draft",
+    "incident_id": null,
+    "notes": "A privileged user accesses an unusually large volume of sensitive files and transfers data to an unapproved destination.",
+    "observer_scores": {},
+    "escalation": null,
+    "collaborations": [],
+    "classification": {},
+    "selected_knowledge_id": null,
+    "selected_knowledge_ids": [],
+    "knowledge_selection": null,
+    "knowledge_selections": [],
+    "knowledge_selection_confirmed_at": null,
+    "knowledge_selection_confirmed_by": null,
+    "combined_response_plan": null,
+    "knowledge_application": null,
+    "knowledge_applications": [],
+    "knowledge_search_result": null,
+    "pir_id": null,
+    "containment": {
+      "status": "not_started",
+      "planned_actions": [],
+      "completed_actions": [],
+      "action_records": [],
+      "verification_checks": [],
+      "notes": "",
+      "evidence": "",
+      "started_at": null,
+      "confirmed_at": null,
+      "outcome": null
+    },
+    "recovery": {
+      "status": "not_started",
+      "actions": [],
+      "action_records": [],
+      "notes": "",
+      "evidence": "",
+      "confirmed_at": null,
+      "outcome": null
+    },
+    "captured_knowledge_ids": [],
+    "created_by": "u1",
+    "created_at": "2026-10-05T21:52:05.868Z",
+    "updated_at": "2026-10-05T21:52:05.868Z",
+    "started_at": null,
+    "completed_at": null
+  }
+]

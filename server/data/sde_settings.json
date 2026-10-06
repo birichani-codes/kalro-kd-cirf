@@ -1,0 +1,17 @@
+{
+  "riskAppetite": 0.5,
+  "knowledgeConfidenceFactor": 0.8,
+  "stationMultipliers": {
+    "Headquarters": 2.0,
+    "Research Institute": 1.5,
+    "Sub-Centre/Field Station": 1.0
+  },
+  "attackerProfiles": {
+    "Script Kiddie": 0.2,
+    "Cyber Criminal": 0.5,
+    "State Actor": 0.9
+  },
+  "socialFrictionPenalty": 1000,
+  "hourlyBusinessCost": 500,
+  "expectedImpactDuration": 2
+}

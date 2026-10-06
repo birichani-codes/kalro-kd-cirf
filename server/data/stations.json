@@ -1,0 +1,7 @@
+[
+  {"id":"headquarters","code":"HQ","name":"Headquarters","label":"KALRO Headquarters","type":"hub","active":true},
+  {"id":"muguga","code":"MUG","name":"Muguga","label":"KALRO Muguga","type":"station","active":true},
+  {"id":"kiboko","code":"KIB","name":"Kiboko","label":"KALRO Kiboko","type":"station","active":true},
+  {"id":"mtwapa","code":"MTW","name":"Mtwapa","label":"KALRO Mtwapa","type":"station","active":true},
+  {"id":"kabati","code":"KAB","name":"Kabati","label":"KALRO Kabati","type":"station","active":true}
+]

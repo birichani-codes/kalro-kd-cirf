@@ -1,0 +1,31 @@
+[
+  {
+    "id": "log-1778435189978-vdpd35j",
+    "timestamp": "2026-05-10T17:46:29.969Z",
+    "source_ip": "unknown",
+    "source_type": "firewall",
+    "event_type": "raw_message",
+    "raw_message": "[object Object]",
+    "fields": {},
+    "severity_raw": "medium",
+    "ingested_at": "2026-05-10T17:46:29.969Z",
+    "station_id": "Site A",
+    "processed": true
+  },
+  {
+    "id": "test-log-002",
+    "source": "ids",
+    "message": "SQL injection attempt detected from 192.168.1.200 to web server",
+    "timestamp": "2024-01-15T10:35:00Z",
+    "severity": "critical",
+    "normalized": {
+      "source_ip": "192.168.1.200",
+      "destination_ip": "10.0.0.2",
+      "attack_type": "sql_injection",
+      "action": "blocked"
+    },
+    "fingerprint": "ids-sql-injection-192.168.1.200-10.0.0.2",
+    "ingested_at": "2024-01-15T10:35:00Z",
+    "processed": true
+  }
+]

@@ -1,0 +1,220 @@
+[
+  {
+    "id": "k1",
+    "title": "Phishing Response Playbook",
+    "knowledge_type": "playbook",
+    "content": "1. Block sending domain at email gateway.\n2. Search mail logs for all recipients.\n3. Force password resets for users who clicked.\n4. Check auth logs for logins from suspicious IPs within 30 minutes of click events.\n5. Send all-staff awareness alert within 2 hours.\n6. Report domain to KE-CIRT and PhishTank.\n\nKALRO note: Users are more likely to fall for emails spoofing IT support during maintenance windows.",
+    "tags": [
+      "phishing",
+      "email",
+      "credential-theft",
+      "awareness"
+    ],
+    "incident_id": "inc1",
+    "contributor_id": "u2",
+    "confidence_score": 0.92,
+    "version": 2,
+    "superseded_by": null,
+    "status": "active",
+    "use_count": 4,
+    "last_used_at": "2024-08-15T10:00:00Z",
+    "created_at": "2024-03-06T08:00:00Z"
+  },
+  {
+    "id": "k2",
+    "title": "Ransomware Containment and Recovery",
+    "knowledge_type": "runbook",
+    "content": "1. Isolate infected machine immediately — pull network cable.\n2. Do NOT shut down — volatile memory may contain decryption keys.\n3. Identify variant using ID Ransomware (upload ransom note).\n4. Check NoMoreRansom.org for known decryptor before considering payment.\n5. Check shared drives for encrypted files.\n6. Restore from most recent clean backup — verify integrity first.\n7. Reimage before reconnecting.\n\nKALRO: Research backups on NAS at backup-nas-01. Snapshots every 6 hours. Contact David Kamau for access.",
+    "tags": [
+      "ransomware",
+      "containment",
+      "recovery",
+      "backup"
+    ],
+    "incident_id": "inc2",
+    "contributor_id": "u4",
+    "confidence_score": 0.95,
+    "version": 1,
+    "superseded_by": null,
+    "status": "active",
+    "use_count": 2,
+    "last_used_at": "2024-07-20T14:00:00Z",
+    "created_at": "2024-04-14T09:00:00Z"
+  },
+  {
+    "id": "k3",
+    "title": "DDoS Mitigation — Upstream Filtering",
+    "knowledge_type": "runbook",
+    "content": "Safaricom Business provides upstream DDoS filtering under enterprise SLA.\n1. Call Safaricom NOC 24/7 — get current number from ICT manager.\n2. Provide account number, describe attack type and volume.\n3. Request null-routing or scrubbing center activation.\n4. Activation time: 15-30 minutes.\n5. Monitor border router during mitigation.\n\nAlternative: Enable Cloudflare Under Attack Mode if domain is proxied.",
+    "tags": [
+      "ddos",
+      "network",
+      "mitigation",
+      "isp"
+    ],
+    "incident_id": "inc4",
+    "contributor_id": "u2",
+    "confidence_score": 0.88,
+    "version": 1,
+    "superseded_by": null,
+    "status": "active",
+    "use_count": 1,
+    "last_used_at": "2024-07-03T15:00:00Z",
+    "created_at": "2024-07-04T08:00:00Z"
+  },
+  {
+    "id": "k4",
+    "title": "Compromised DB Credentials — Investigation",
+    "knowledge_type": "playbook",
+    "content": "1. Lock the compromised account immediately.\n2. Pull 30 days of auth logs.\n3. Check for data exfiltration — review SELECT queries on sensitive tables.\n4. Check credential reuse across systems.\n5. Interview account owner.\n6. Preserve logs before remediation.\n7. Escalate to HR and legal before confronting the user if insider threat suspected.\n\nKALRO: Audit logs at /var/log/mysql/audit.log on hr-db-server-01. 90-day retention.",
+    "tags": [
+      "unauthorized-access",
+      "database",
+      "credentials",
+      "insider-threat"
+    ],
+    "incident_id": "inc3",
+    "contributor_id": "u2",
+    "confidence_score": 0.85,
+    "version": 1,
+    "superseded_by": null,
+    "status": "active",
+    "use_count": 1,
+    "last_used_at": "2024-06-19T10:00:00Z",
+    "created_at": "2024-06-19T08:00:00Z"
+  },
+  {
+    "id": "k5",
+    "title": "PowerShell Obfuscation Detection",
+    "knowledge_type": "reference",
+    "content": "Indicators: Base64-encoded args, Invoke-Expression (IEX), download cradles.\n\n1. Collect PowerShell transcript from machine.\n2. Decode base64: [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String(\"...\"))\n3. Submit to VirusTotal.\n4. Block C2 IP at firewall immediately.\n5. Check for new scheduled tasks and registry run keys.\n\nPreventive: Enable Constrained Language Mode on non-admin workstations via Group Policy.",
+    "tags": [
+      "powershell",
+      "malware",
+      "endpoint",
+      "C2"
+    ],
+    "incident_id": "inc5",
+    "contributor_id": "u2",
+    "confidence_score": 0.48,
+    "version": 1,
+    "superseded_by": null,
+    "status": "active",
+    "use_count": 0,
+    "last_used_at": null,
+    "created_at": "2024-08-21T09:00:00Z"
+  },
+  {
+    "id": "k787fa9dd",
+    "title": "Routine: Staff clicked links in emails that mimicked an int",
+    "content": "Rapid domain block. Awareness message sent same day. Users responded quickly to password reset instructions.",
+    "tags": [
+      "phishing"
+    ],
+    "incident_id": "inc1",
+    "knowledge_type": "defensive-routine",
+    "contributor_id": "u1",
+    "confidence_score": 0.75,
+    "version": 1,
+    "superseded_by": null,
+    "status": "active",
+    "use_count": 0,
+    "last_used_at": null,
+    "created_at": "2026-05-01T18:12:32.002Z",
+    "defensive_routine": {
+      "enabled": true,
+      "category": "response-checklist",
+      "primary_goal": "",
+      "payoff_weight": 0.6,
+      "payoff_rating": null,
+      "nist_function": "PR",
+      "associated_scripts": [],
+      "institutional_enablers": [],
+      "socio_technical_focus": "technical",
+      "success_rate": 0.5,
+      "times_applied": 0,
+      "avg_resolution_time": "0h",
+      "applicable_severities": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "applicable_incident_types": [
+        "inc1"
+      ],
+      "prerequisites": [],
+      "estimated_cost": null,
+      "estimated_time_to_resolve": null,
+      "routine_signature": []
+    }
+  },
+  {
+    "id": "k_phish_account",
+    "title": "Phishing-Induced KALRO Account Compromise Response",
+    "knowledge_type": "playbook",
+    "content": "Use this playbook when a KALRO user reports phishing and there is evidence of unauthorized account access.\n\nContainment actions:\n1. Revoke all active sessions and refresh tokens for the affected @kalro.org account.\n2. Temporarily disable or lock the affected account if unauthorized access is confirmed.\n3. Remove unauthorized mailbox forwarding rules, delegates, or persistence settings.\n4. Block the phishing sender, URL, and related indicators at the email/web security controls.\n5. Preserve authentication and mailbox audit logs before making further changes.\n\nRecovery actions:\n6. Reset the user password using a verified administrator workflow.\n7. Verify or re-register MFA and confirm recovery information has not been changed.\n8. Review sign-in, mailbox, and access logs for suspicious activity or data access.\n9. Restore account access only after unauthorized sessions and persistence are removed.\n10. Monitor the account for recurring suspicious activity and search for other recipients of the same phishing message.\n\nEscalate when the affected account is privileged, multiple users are compromised, sensitive data may have been accessed, lateral movement is suspected, or the above actions do not stop suspicious activity.",
+    "tags": [
+      "phishing",
+      "credential-compromise",
+      "email",
+      "account-security",
+      "kalro"
+    ],
+    "incident_id": null,
+    "contributor_id": "u2",
+    "station_id": "Muguga",
+    "confidence_score": 0.94,
+    "version": 1,
+    "superseded_by": null,
+    "status": "active",
+    "use_count": 0,
+    "last_used_at": null,
+    "created_at": "2026-10-04T00:00:00.000Z",
+    "structured_response": {
+      "containment_actions": [
+        "Revoke all active sessions and refresh tokens for the affected account",
+        "Temporarily disable or lock the affected account",
+        "Remove unauthorized mailbox forwarding rules, delegates, or persistence settings",
+        "Block the phishing sender, URL, and related indicators",
+        "Preserve authentication and mailbox audit logs before further changes",
+        "Search for other recipients of the same phishing message and identify additional affected users",
+        "Review recent privilege, MFA, recovery-information, and password-reset changes",
+        "Assess whether sensitive mailbox or connected-service data was accessed or exported"
+      ],
+      "recovery_actions": [
+        "Reset the user password using a verified administrator workflow",
+        "Verify or re-register MFA and confirm recovery information has not been changed",
+        "Confirm unauthorized forwarding rules, delegates, sessions, and persistence are removed",
+        "Review sign-in, mailbox, and access logs for suspicious activity or data access",
+        "Restore account access only after validation checks pass",
+        "Notify the affected user of the recovery actions and required precautions",
+        "Monitor the account for recurring suspicious activity for the defined observation period",
+        "Confirm no other users remain affected by the same phishing campaign"
+      ],
+      "success_criteria": [
+        "No unauthorized active sessions remain",
+        "Unauthorized forwarding rules, delegates, and persistence are removed",
+        "Credentials, MFA, and recovery information are secured",
+        "No further suspicious sign-ins occur during validation",
+        "Potential data access has been reviewed and documented",
+        "Other recipients of the same phishing campaign have been assessed"
+      ],
+      "escalation_conditions": [
+        "Privileged or administrator account involved",
+        "Multiple users appear compromised",
+        "Sensitive data access or exfiltration is suspected",
+        "Lateral movement is suspected",
+        "Knowledge-guided containment is partial or unsuccessful"
+      ],
+      "verification_checks": [
+        "No unauthorized active sessions remain",
+        "Unauthorized forwarding rules, delegates, and persistence are removed",
+        "Credentials, MFA, and recovery information are secured",
+        "No further suspicious sign-ins occur during validation",
+        "Potential data access has been reviewed and documented",
+        "Other recipients of the same phishing campaign have been assessed"
+      ]
+    }
+  }
+]
