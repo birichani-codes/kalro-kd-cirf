@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": "evtcdd2619a",
+    "operational_test_id": "tt3f74fa0e",
+    "incident_id": null,
+    "event_type": "OPERATIONAL_TEST_STARTED",
+    "actor_id": "u1",
+    "actor_role": "super_admin",
+    "source": "operational-testing",
+    "details": {
+      "scenario": "Suspected Insider Data Exfiltration"
+    },
+    "timestamp": "2026-10-08T12:14:08.344Z"
+  }
+]
