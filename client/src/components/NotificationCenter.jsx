@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import { io } from 'socket.io-client'
+import { useState, useEffect, useCallback } from 'react'
 import api from '../api/axios'
 import { useAuth } from '../context/AuthContext'
 
@@ -10,306 +9,13 @@ export default function NotificationCenter() {
   const [unread, setUnread] = useState(0)
   const [showPanel, setShowPanel] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [socketConnected, setSocketConnected] = useState(false)
-
-  // =====================================================
-  // BACKEND URL
-  // =====================================================
-
-  const serverOrigin =
-    import.meta.env.VITE_API_URL ||
-    'http://localhost:10000'
-
-  // =====================================================
-  // LOAD NOTIFICATIONS + REAL-TIME SOCKET
-  // =====================================================
-
-  useEffect(() => {
-    if (!user) {
-      setNotifs([])
-      setUnread(0)
-      setSocketConnected(false)
-      return
-    }
-
-    let mounted = true
-
-    const loadInitialNotifications = async () => {
-      try {
-        setLoading(true)
-        await loadNotifications()
-      } finally {
-        if (mounted) {
-          setLoading(false)
-        }
-      }
-    }
-
-    loadInitialNotifications()
-
-    /*
-     * REST fallback.
-     *
-     * Even if Socket.IO is unavailable, notifications
-     * will still refresh every 10 seconds.
-     */
-    const interval = setInterval(() => {
-      loadNotifications()
-    }, 10000)
-
-    // ===================================================
-    // SOCKET.IO CONNECTION
-    // ===================================================
-
-    const socket = io(serverOrigin, {
-      transports: [
-        'websocket',
-        'polling'
-      ],
-
-      withCredentials: true,
-
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1500,
-      reconnectionDelayMax: 5000,
-
-      timeout: 10000
-    })
-
-    const pushLiveNotification = (event, source) => {
-      if (!event) return
-
-      const isUsbEvent =
-        source === 'usb_event'
-
-      const eventType =
-        event.eventType ||
-        event.event_type ||
-        ''
-
-      const deviceName =
-        event.device?.deviceName ||
-        event.device?.name ||
-        event.device?.serialNumber ||
-        'unknown device'
-
-      const station =
-        event.stationId ||
-        event.station_id ||
-        event.workstationId ||
-        event.workstation_id ||
-        'Unknown station'
-
-      const title =
-        event.title ||
-        (
-          isUsbEvent
-            ? `USB ${
-                eventType === 'usb_removal'
-                  ? 'removed'
-                  : 'inserted'
-              }`
-            : 'External Media Alert'
-        )
-
-      const message =
-        event.description ||
-        event.message ||
-        (
-          `Device ${deviceName} ${
-            eventType === 'usb_removal'
-              ? 'removed'
-              : 'connected'
-          } at ${station}`
-        )
-
-      const severity =
-        event.severity ||
-        (
-          source === 'emii_alert'
-            ? (
-                event.requires_attention
-                  ? 'critical'
-                  : 'high'
-              )
-            : 'normal'
-        )
-
-      const relatedId =
-        event.related_incident_id ||
-        event.relatedIncidentId ||
-        null
-
-      /*
-       * Only create an incident link if we actually have
-       * an incident ID.
-       *
-       * Do not use the notification/event ID as an incident ID.
-       */
-      const action_url =
-        relatedId
-          ? `/incidents/${relatedId}`
-          : null
-
-      const liveNotif = {
-        id:
-          event.notification_id ||
-          event.id ||
-          `live-${Date.now()}-${Math.random()
-            .toString(36)
-            .slice(2, 11)}`,
-
-        title,
-        message,
-
-        type:
-          event.type ||
-          'incident_alert',
-
-        severity,
-
-        read: false,
-
-        created_at:
-          event.created_at ||
-          event.timestamp ||
-          new Date().toISOString(),
-
-        action_url,
-
-        live: true,
-        source
-      }
-
-      setNotifs(prev => {
-        /*
-         * Avoid duplicate live notifications if the same
-         * event is emitted more than once.
-         */
-        const exists = prev.some(
-          item => item.id === liveNotif.id
-        )
-
-        if (exists) {
-          return prev
-        }
-
-        return [
-          liveNotif,
-          ...prev
-        ].slice(0, 25)
-      })
-
-      setUnread(prev => prev + 1)
-    }
-
-    // ===================================================
-    // SOCKET EVENTS
-    // ===================================================
-
-    socket.on('connect', () => {
-      if (!mounted) return
-
-      setSocketConnected(true)
-
-      console.debug(
-        '[Socket] connected to notification service:',
-        socket.id,
-        serverOrigin
-      )
-    })
-
-    socket.on('disconnect', reason => {
-      if (!mounted) return
-
-      setSocketConnected(false)
-
-      console.debug(
-        '[Socket] disconnected from notification service:',
-        reason
-      )
-    })
-
-    socket.on('connect_error', err => {
-      if (!mounted) return
-
-      setSocketConnected(false)
-
-      /*
-       * Use warn instead of repeatedly throwing disruptive
-       * errors. REST polling remains available.
-       */
-      console.warn(
-        '[Socket] real-time notification connection unavailable:',
-        err?.message || err
-      )
-    })
-
-    /*
-     * External-media events.
-     *
-     * These listeners may remain even while physical EMII
-     * monitoring is disabled. They simply do nothing unless
-     * the backend emits such events.
-     */
-    socket.on('emii_alert', event => {
-      pushLiveNotification(
-        event,
-        'emii_alert'
-      )
-    })
-
-    socket.on('usb_event', event => {
-      pushLiveNotification(
-        event,
-        'usb_event'
-      )
-    })
-
-    /*
-     * General notification event.
-     *
-     * This allows Operational Testing, collaboration,
-     * escalation, incident assignment, knowledge actions,
-     * etc. to push notifications through the same channel
-     * when the backend emits "notification".
-     */
-    socket.on('notification', event => {
-      pushLiveNotification(
-        event,
-        'notification'
-      )
-    })
-
-    /*
-     * Optional incident notification channel.
-     */
-    socket.on('incident_notification', event => {
-      pushLiveNotification(
-        event,
-        'incident_notification'
-      )
-    })
-
-    return () => {
-      mounted = false
-
-      clearInterval(interval)
-
-      socket.removeAllListeners()
-
-      socket.disconnect()
-
-      setSocketConnected(false)
-    }
-  }, [user, serverOrigin])
+  const [lastUpdated, setLastUpdated] = useState(null)
 
   // =====================================================
   // LOAD STORED NOTIFICATIONS
   // =====================================================
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     if (!user) return
 
     try {
@@ -343,13 +49,59 @@ export default function NotificationCenter() {
           ? unreadCount
           : 0
       )
+
+      setLastUpdated(new Date())
     } catch (err) {
       console.error(
-        'Failed to load notifications:',
+        '[Notifications] Failed to load notifications:',
         err
       )
     }
-  }
+  }, [user])
+
+  // =====================================================
+  // INITIAL LOAD + AUTO REFRESH
+  // =====================================================
+
+  useEffect(() => {
+    if (!user) {
+      setNotifs([])
+      setUnread(0)
+      setLastUpdated(null)
+      return
+    }
+
+    let mounted = true
+
+    const initialLoad = async () => {
+      try {
+        setLoading(true)
+
+        await loadNotifications()
+      } finally {
+        if (mounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    initialLoad()
+
+    /*
+     * Poll the backend every 10 seconds.
+     *
+     * This keeps notifications current without requiring
+     * Socket.IO/WebSocket support during deployment.
+     */
+    const interval = setInterval(() => {
+      loadNotifications()
+    }, 10000)
+
+    return () => {
+      mounted = false
+      clearInterval(interval)
+    }
+  }, [user, loadNotifications])
 
   // =====================================================
   // MARK ONE AS READ
@@ -360,36 +112,8 @@ export default function NotificationCenter() {
 
     const notification =
       notifs.find(
-        n => n.id === notifId
+        item => item.id === notifId
       )
-
-    /*
-     * A live-only notification might not yet exist in the
-     * REST store. In that case update it locally.
-     */
-    if (notification?.live) {
-      setNotifs(prev =>
-        prev.map(item =>
-          item.id === notifId
-            ? {
-                ...item,
-                read: true
-              }
-            : item
-        )
-      )
-
-      if (!notification.read) {
-        setUnread(prev =>
-          Math.max(
-            0,
-            prev - 1
-          )
-        )
-      }
-
-      return
-    }
 
     try {
       await api.put(
@@ -417,7 +141,7 @@ export default function NotificationCenter() {
       }
     } catch (err) {
       console.error(
-        'Failed to mark notification as read:',
+        '[Notifications] Failed to mark notification as read:',
         err
       )
     }
@@ -443,7 +167,7 @@ export default function NotificationCenter() {
       setUnread(0)
     } catch (err) {
       console.error(
-        'Failed to mark all notifications as read:',
+        '[Notifications] Failed to mark all notifications as read:',
         err
       )
     }
@@ -458,31 +182,8 @@ export default function NotificationCenter() {
 
     const notification =
       notifs.find(
-        n => n.id === notifId
+        item => item.id === notifId
       )
-
-    /*
-     * Live-only notification:
-     * remove locally without calling REST API.
-     */
-    if (notification?.live) {
-      setNotifs(prev =>
-        prev.filter(
-          item => item.id !== notifId
-        )
-      )
-
-      if (!notification.read) {
-        setUnread(prev =>
-          Math.max(
-            0,
-            prev - 1
-          )
-        )
-      }
-
-      return
-    }
 
     try {
       await api.delete(
@@ -505,7 +206,7 @@ export default function NotificationCenter() {
       }
     } catch (err) {
       console.error(
-        'Failed to delete notification:',
+        '[Notifications] Failed to delete notification:',
         err
       )
     }
@@ -577,6 +278,22 @@ export default function NotificationCenter() {
     }
 
     return date.toLocaleString()
+  }
+
+  // =====================================================
+  // LAST UPDATED LABEL
+  // =====================================================
+
+  const formatLastUpdated = () => {
+    if (!lastUpdated) {
+      return 'AUTO REFRESH'
+    }
+
+    return `UPDATED ${lastUpdated.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    })}`
   }
 
   // =====================================================
@@ -695,36 +412,61 @@ export default function NotificationCenter() {
                 style={{
                   marginTop: 3,
                   fontSize: 10,
-                  color:
-                    socketConnected
-                      ? 'var(--kalro-green)'
-                      : '#999'
+                  color: '#999',
+                  fontFamily:
+                    'var(--font-mono)'
                 }}
               >
-                {socketConnected
-                  ? '● LIVE'
-                  : '○ REFRESHING'}
+                ○ {formatLastUpdated()}
               </div>
             </div>
 
-            {unread > 0 && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8
+              }}
+            >
               <button
-                onClick={
-                  handleMarkAllAsRead
-                }
+                onClick={loadNotifications}
+                disabled={loading}
                 style={{
                   background: 'none',
                   border: 'none',
-                  color: '#2196F3',
-                  cursor: 'pointer',
-                  fontSize: '12px',
-                  textDecoration:
-                    'underline'
+                  color: '#666',
+                  cursor:
+                    loading
+                      ? 'default'
+                      : 'pointer',
+                  fontSize: '12px'
                 }}
+                title="Refresh notifications"
               >
-                Mark all read
+                {loading
+                  ? '...'
+                  : '↻'}
               </button>
-            )}
+
+              {unread > 0 && (
+                <button
+                  onClick={
+                    handleMarkAllAsRead
+                  }
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#2196F3',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    textDecoration:
+                      'underline'
+                  }}
+                >
+                  Mark all read
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Notification List */}
@@ -772,6 +514,7 @@ export default function NotificationCenter() {
 
                     display: 'flex',
                     gap: '10px',
+
                     alignItems:
                       'flex-start',
 
@@ -908,12 +651,6 @@ export default function NotificationCenter() {
                           notif.created_at
                         )}
                       </span>
-
-                      {notif.live && (
-                        <span>
-                          LIVE
-                        </span>
-                      )}
                     </div>
                   </div>
 
